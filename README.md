@@ -1,88 +1,167 @@
-# 🩺 BioSence — GenAI-Powered Predictive Health Intelligence
+<div align="center">
 
-<p align="center">
-  <strong>Turning wearable health data into personalized, evidence-grounded insights.</strong>
-</p>
+<!-- Replace with your logo/banner: docs/assets/banner.png -->
+<!-- <img src="docs/assets/banner.png" alt="BioSence banner" width="100%"/> -->
 
-<p align="center">
-  AI/ML · Generative AI · RAG · Predictive Analytics · Wearable Health Monitoring
-</p>
+# 🩺 BioSence
+
+### GenAI-Powered Predictive Health Intelligence
+
+**Turning wearable health data into personalized, evidence-grounded insights.**
+
+<br/>
+
+![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![React](https://img.shields.io/badge/React-Vite-61DAFB?style=for-the-badge&logo=react&logoColor=black)
+![FastAPI](https://img.shields.io/badge/FastAPI-Backend-009688?style=for-the-badge&logo=fastapi&logoColor=white)
+![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)
+![Gemini](https://img.shields.io/badge/Google-Gemini-8E75B2?style=for-the-badge&logo=googlegemini&logoColor=white)
+![LangChain](https://img.shields.io/badge/LangChain-RAG-1C3C3C?style=for-the-badge&logo=langchain&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+
+![Status](https://img.shields.io/badge/status-in%20development-orange?style=flat-square)
+![Type](https://img.shields.io/badge/type-final--year%20B.Tech%20project-blue?style=flat-square)
+![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen?style=flat-square)
+![Not a medical device](https://img.shields.io/badge/medical%20device-NO-red?style=flat-square)
+
+**AI/ML · Generative AI · RAG · Predictive Analytics · Wearable Health Monitoring**
+
+[Overview](#-overview) •
+[Features](#-key-features) •
+[Architecture](#-system-architecture) •
+[Tech Stack](#-technology-stack) •
+[Getting Started](#-getting-started) •
+[Evaluation](#-model-evaluation) •
+[Security](#-security-and-privacy) •
+[Roadmap](#-roadmap)
+
+</div>
+
+---
+
+> [!WARNING]
+> **BioSence is an educational and engineering project, not a medical diagnostic device.** Its outputs are informational only and are **not** a substitute for professional medical advice, diagnosis, or treatment. Always consult a qualified healthcare professional.
+
+---
+
+## 📑 Table of Contents
+
+- [Overview](#-overview)
+- [Why BioSence?](#-why-biosence)
+- [Project Objectives](#-project-objectives)
+- [Key Features](#-key-features)
+- [System Architecture](#-system-architecture)
+- [Technology Stack](#-technology-stack)
+- [How It Works](#-how-it-works)
+- [Getting Started](#-getting-started)
+- [Project Structure](#-project-structure)
+- [Model Evaluation](#-model-evaluation)
+- [Security and Privacy](#-security-and-privacy)
+- [Roadmap](#-roadmap)
+- [Contributing](#-contributing)
+- [License](#-license)
+- [Author](#-author)
 
 ---
 
 ## 🌟 Overview
 
-**BioSence** is an AI-powered health intelligence platform designed to analyze wearable health data, identify unusual patterns, forecast health-related trends where supported by sufficient data, and provide evidence-grounded information through a Generative AI assistant.
+**BioSence** is an AI-powered health intelligence platform that analyzes wearable health data, identifies unusual patterns, forecasts health-related trends where the data supports it, and answers questions through a **Generative AI assistant grounded in approved health documents**.
 
-The platform combines Machine Learning, time-series analytics, Retrieval-Augmented Generation (RAG), and a web-based dashboard to make health data easier to understand.
+It combines **Machine Learning**, **time-series analytics**, **Retrieval-Augmented Generation (RAG)**, and an interactive **web dashboard** to make personal health data easier to understand and act on, supporting continuous monitoring through personalized insights, anomaly alerts, and trusted health-information retrieval.
 
-BioSence aims to support continuous health monitoring and informed decision-making through personalized insights, anomaly alerts, and trusted health-information retrieval.
+<div align="center">
 
-> **Disclaimer:** BioSence is an educational and engineering project, not a medical diagnostic device. Its outputs are not a substitute for professional medical advice.
+```
+Better Data  →  Smarter Insights  →  Healthier Tomorrow
+```
+
+</div>
+
+---
+
+## 💡 Why BioSence?
+
+| The problem | The BioSence approach |
+| --- | --- |
+| Wearable apps show raw numbers with little context | **Personalized baselines** so "normal" is defined per user, not by a population average |
+| Generic thresholds cause false alarms | **Statistical + ML anomaly detection** tuned and measured by precision, recall, and false-alarm rate |
+| LLM health answers can hallucinate | **RAG with citations** over approved documents, with safe fallback when evidence is lacking |
+| Health data is highly sensitive | **Auth, RBAC, and Row Level Security** designed in from the start |
+| Demos that only "look good" | **Measurable evaluation** for every AI component |
+
+---
 
 ## 🎯 Project Objectives
 
-* Monitor physiological data from compatible wearable devices or datasets.
-* Establish personalized baselines from historical measurements.
-* Detect unusual patterns using statistical and machine-learning techniques.
-* Forecast future trends when suitable longitudinal data is available.
-* Provide evidence-grounded explanations using Generative AI and RAG.
-* Present health trends and alerts through an interactive dashboard.
-* Support authorized caregiver and administrator monitoring.
-* Protect personal health information through authentication and access controls.
+- [x] Define a clear, measurable scope for health monitoring and insight generation
+- [ ] Monitor physiological data from compatible wearable devices or datasets
+- [ ] Establish personalized baselines from historical measurements
+- [ ] Detect unusual patterns using statistical and machine-learning techniques
+- [ ] Forecast future trends when suitable longitudinal data is available
+- [ ] Provide evidence-grounded explanations using Generative AI and RAG
+- [ ] Present trends and alerts through an interactive dashboard
+- [ ] Support authorized caregiver and administrator monitoring
+- [ ] Protect personal health information with authentication and access controls
+
+> Update the checkboxes as features are implemented and verified.
+
+---
 
 ## ✨ Key Features
 
 ### 👤 Personal Health Dashboard
 
-* Personal profile and health-data management.
-* Health readings and historical trend visualizations.
-* Personalized baseline monitoring.
-* Anomaly alerts and health-information assistance.
-* User-specific access to personal records.
+- Personal profile and health-data management
+- Health readings with historical trend visualizations
+- Personalized baseline monitoring
+- Anomaly alerts and health-information assistance
+- User-specific access to personal records only
 
 ### 🛡️ Administrative Dashboard
 
-* Registered-user management.
-* Authorized health-data and trend monitoring.
-* Alert review and status management.
-* Role-based permissions and audit logging.
+- Registered-user management
+- Authorized health-data and trend monitoring
+- Alert review and status management
+- Role-based permissions and audit logging
 
-*The administrative dashboard is a planned or in-progress feature until its implementation is verified in the repository.*
+> 🚧 *Planned / in progress until implementation is verified in the repository.*
 
 ### ⌚ Wearable Health Integration
 
-Potential metrics include:
+| Metric | Description |
+| --- | --- |
+| ❤️ Heart rate | Resting and active heart-rate readings |
+| 🩸 SpO₂ | Blood oxygen saturation |
+| 📉 HRV | Heart-rate variability |
+| 😴 Sleep | Duration and patterns |
+| 🏃 Activity | Physical activity and movement |
 
-* Heart rate
-* Blood oxygen saturation (SpO₂)
-* Heart-rate variability (HRV)
-* Sleep duration and patterns
-* Physical activity and movement
-
-Actual data availability depends on the connected device, official API, user permissions, and platform limitations.
+> Actual data availability depends on the connected device, official API, user permissions, and platform limitations.
 
 ### 🧠 AI-Powered Anomaly Detection
 
-* Personalized baseline calculation.
-* Statistical anomaly detection using methods such as Modified Z-Score.
-* Potential machine-learning extensions.
-* Evaluation using precision, recall, F1-score, and false-alarm rates.
+- Personalized baseline calculation per user
+- Statistical detection using methods such as **Modified Z-Score** (median/MAD-based, robust to outliers)
+- Extensible to ML approaches (e.g., Isolation Forest)
+- Evaluated with **precision, recall, F1-score, and false-alarm rate**
 
 ### 📈 Predictive Analytics
 
-* Historical time-series analysis.
-* Trend forecasting where supported by the data.
-* Evaluation using MAE and RMSE.
-* Time-aware model validation to reduce data leakage.
+- Historical time-series analysis
+- Trend forecasting where the data supports it
+- Evaluated with **MAE** and **RMSE**
+- **Time-aware validation** to prevent data leakage
 
 ### 💬 GenAI Health Assistant
 
-* Retrieval-Augmented Generation.
-* Search over approved health-information documents.
-* Context-grounded answers.
-* Source citations and evidence-aware responses.
-* Safe handling of questions that lack sufficient supporting evidence.
+- Retrieval-Augmented Generation over approved health-information documents
+- Context-grounded answers with **source citations**
+- Evidence-aware responses
+- **Safe refusal / fallback** when supporting evidence is insufficient
+
+---
 
 ## 🏗️ System Architecture
 
@@ -116,91 +195,239 @@ flowchart TD
     SEC --> DB
 ```
 
-This diagram represents the intended architecture. Components and connections should be updated as implementation progresses.
-
-## 🛠️ Technology Stack
-
-| Layer                 | Technologies                |
-| --------------------- | --------------------------- |
-| Programming languages | Python, TypeScript, SQL     |
-| Frontend              | React, Vite, Tailwind CSS   |
-| Backend               | FastAPI, where required     |
-| Database              | PostgreSQL, Supabase        |
-| Authentication        | Supabase Auth               |
-| AI/ML                 | NumPy, Pandas, Scikit-learn |
-| Generative AI         | Google Gemini               |
-| LLM orchestration     | LangChain                   |
-| Vector search         | FAISS and embeddings        |
-| Deployment            | Docker and cloud hosting    |
-| Version control       | Git and GitHub              |
-
-The actual stack may differ depending on the existing codebase. Technologies that are not yet implemented should be considered planned integrations.
-
-## 🔄 Project Workflow
-
-1. **Data collection:** Obtain health readings from a supported wearable API, manual entry, or a clearly identified dataset.
-2. **Preprocessing:** Validate measurements, handle missing values, normalize timestamps, and check data quality.
-3. **Personalization:** Establish an appropriate baseline using historical data.
-4. **Anomaly detection:** Identify unusual patterns using validated statistical or ML methods.
-5. **Predictive analytics:** Forecast trends when sufficient historical data exists.
-6. **Knowledge retrieval:** Retrieve relevant passages from approved health documents.
-7. **GenAI response:** Generate explanations grounded in retrieved evidence.
-8. **Visualization:** Present readings, trends, alerts, and sources through the dashboard.
-9. **Secure administration:** Allow authorized administrators to monitor users and alerts according to assigned permissions.
-
-## 🔐 Security and Privacy
-
-BioSence is designed with the following security principles:
-
-* Authentication and role-based authorization.
-* Database-level Row Level Security (RLS).
-* User ownership checks for personal health records.
-* Restricted administrative access.
-* Secure handling of API credentials through environment variables.
-* Minimal collection and exposure of sensitive information.
-* Auditable access to sensitive records.
-* Careful handling of health data sent to external AI services.
-
-These are design goals; their implementation and effectiveness must be verified through security testing.
-
-## 📊 Model Evaluation
-
-BioSence will use measurable evaluation rather than relying only on visual demonstrations.
-
-| Component            | Evaluation                                                |
-| -------------------- | --------------------------------------------------------- |
-| Anomaly detection    | Precision, recall, F1-score, false-alarm rate             |
-| Predictive analytics | MAE, RMSE, temporal validation                            |
-| RAG retrieval        | Recall@K, Precision@K, MRR where appropriate              |
-| GenAI responses      | Groundedness, citation correctness, relevance             |
-| Application          | Test coverage, latency, reliability, access-control tests |
-
-
-## 👨‍💻 Project Information
-
-**Project:** BioSence — GenAI-Powered Predictive Health Intelligence
-
-**Domain:** Artificial Intelligence, Machine Learning, Generative AI, Digital Health
-
-**Project Type:** Final-year B.Tech Artificial Intelligence and Data Science project
-
-**Developer:** Akash T.
-
-**GitHub:** [akashtcaa2005](https://github.com/akashtcaa2005)
-
-**LinkedIn:** [Akash T.](https://linkedin.com/in/akash-t-845439314/)
-
-## 🤝 Contributions
-
-Contributions, feedback, and technical suggestions are welcome. Please open an issue to discuss significant changes before submitting a pull request.
-
-## 📄 License
-
-Choose and add an appropriate open-source license before distributing this repository. Until a license is added, do not assume others have permission to reuse the project's code.
+> This diagram represents the **intended architecture**. Components and connections are updated as implementation progresses.
 
 ---
 
-<p align="center">
-  <strong>BioSence</strong><br/>
-  Better Data → Smarter Insights → Healthier Tomorrow
-</p>
+## 🛠️ Technology Stack
+
+| Layer | Technologies |
+| --- | --- |
+| **Languages** | Python, TypeScript, SQL |
+| **Frontend** | React, Vite, Tailwind CSS |
+| **Backend** | FastAPI (where required) |
+| **Database** | PostgreSQL, Supabase |
+| **Authentication** | Supabase Auth |
+| **AI / ML** | NumPy, Pandas, Scikit-learn |
+| **Generative AI** | Google Gemini |
+| **LLM Orchestration** | LangChain |
+| **Vector Search** | FAISS + embeddings |
+| **Deployment** | Docker, cloud hosting |
+| **Version Control** | Git, GitHub |
+
+> The actual stack may differ depending on the existing codebase. Technologies not yet implemented should be treated as planned integrations.
+
+---
+
+## 🔄 How It Works
+
+```mermaid
+flowchart LR
+    A[1. Collect] --> B[2. Preprocess]
+    B --> C[3. Personalize]
+    C --> D[4. Detect]
+    D --> E[5. Forecast]
+    E --> F[6. Retrieve]
+    F --> G[7. Generate]
+    G --> H[8. Visualize]
+    H --> I[9. Administer]
+```
+
+| # | Stage | What happens |
+| --- | --- | --- |
+| 1 | **Data collection** | Readings from a supported wearable API, manual entry, or a clearly identified dataset |
+| 2 | **Preprocessing** | Validate measurements, handle missing values, normalize timestamps, check data quality |
+| 3 | **Personalization** | Build an appropriate baseline from historical data |
+| 4 | **Anomaly detection** | Flag unusual patterns using validated statistical or ML methods |
+| 5 | **Predictive analytics** | Forecast trends when enough history exists |
+| 6 | **Knowledge retrieval** | Pull relevant passages from approved health documents |
+| 7 | **GenAI response** | Generate explanations grounded in retrieved evidence |
+| 8 | **Visualization** | Show readings, trends, alerts, and sources in the dashboard |
+| 9 | **Secure administration** | Authorized admins monitor users and alerts per assigned permissions |
+
+---
+
+## 🚀 Getting Started
+
+> ⚠️ The commands below are a **template**. Adjust paths, scripts, and variable names to match the actual repository.
+
+### Prerequisites
+
+- Python **3.11+**
+- Node.js **18+** and npm (or pnpm)
+- A [Supabase](https://supabase.com) project
+- A [Google Gemini API key](https://aistudio.google.com/)
+- Docker (optional)
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/akashtcaa2005/<repo-name>.git
+cd <repo-name>
+```
+
+### 2. Configure environment variables
+
+Create a `.env` file (never commit it):
+
+```env
+# Supabase
+SUPABASE_URL=your_supabase_project_url
+SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key   # backend only, never expose to the client
+
+# Generative AI
+GEMINI_API_KEY=your_gemini_api_key
+
+# App
+APP_ENV=development
+```
+
+### 3. Run the backend
+
+```bash
+cd backend
+python -m venv .venv
+source .venv/bin/activate          # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload
+```
+
+### 4. Run the frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+### 5. (Optional) Run with Docker
+
+```bash
+docker compose up --build
+```
+
+---
+
+## 🗂️ Project Structure
+
+> Suggested layout. Update to reflect the real repository.
+
+```text
+biosence/
+├── frontend/              # React + Vite + Tailwind dashboard
+├── backend/               # FastAPI services
+│   ├── app/
+│   │   ├── api/           # Routes
+│   │   ├── ml/            # Baselines, anomaly detection, forecasting
+│   │   ├── rag/           # Ingestion, embeddings, retrieval, generation
+│   │   └── core/          # Config, auth, security
+├── data/                  # Datasets and approved health documents
+├── notebooks/             # Experiments and evaluation
+├── supabase/              # Migrations and RLS policies
+├── docs/                  # Diagrams, screenshots, reports
+├── tests/                 # Unit, integration, access-control tests
+├── docker-compose.yml
+└── README.md
+```
+
+---
+
+## 📊 Model Evaluation
+
+BioSence relies on **measurable evaluation**, not just visual demos.
+
+| Component | Metrics |
+| --- | --- |
+| 🚨 Anomaly detection | Precision, recall, F1-score, false-alarm rate |
+| 📈 Predictive analytics | MAE, RMSE, temporal validation |
+| 🔎 RAG retrieval | Recall@K, Precision@K, MRR |
+| 💬 GenAI responses | Groundedness, citation correctness, relevance |
+| ⚙️ Application | Test coverage, latency, reliability, access-control tests |
+
+### Results
+
+> Fill these in once experiments are complete. Report the dataset used and the validation method.
+
+| Component | Metric | Result |
+| --- | --- | --- |
+| Anomaly detection | F1-score | _TBD_ |
+| Forecasting | MAE / RMSE | _TBD_ |
+| RAG retrieval | Recall@5 | _TBD_ |
+| GenAI | Groundedness | _TBD_ |
+
+---
+
+## 🔐 Security and Privacy
+
+Design principles:
+
+- 🔑 Authentication and role-based authorization
+- 🧱 Database-level **Row Level Security (RLS)**
+- 👤 User ownership checks on personal health records
+- 🚪 Restricted administrative access
+- 🗝️ API credentials handled via environment variables
+- 🧼 Minimal collection and exposure of sensitive information
+- 📜 Auditable access to sensitive records
+- 🤖 Careful handling of health data sent to external AI services
+
+> [!NOTE]
+> These are **design goals**. Their implementation and effectiveness must be verified through security testing (e.g., access-control and authorization tests).
+
+Found a vulnerability? Please report it privately through the contact details below rather than opening a public issue.
+
+---
+
+## 🗺️ Roadmap
+
+- [ ] Wearable data ingestion pipeline
+- [ ] Personalized baseline engine
+- [ ] Modified Z-Score anomaly detection
+- [ ] ML-based anomaly detection extension
+- [ ] Time-series forecasting module
+- [ ] RAG pipeline with approved document corpus and citations
+- [ ] Interactive user dashboard
+- [ ] Admin dashboard with audit logging
+- [ ] RLS policies and access-control test suite
+- [ ] Evaluation report with published metrics
+- [ ] Dockerized deployment
+
+---
+
+## 🤝 Contributing
+
+Contributions, feedback, and technical suggestions are welcome.
+
+1. Open an issue to discuss significant changes first
+2. Fork the repository
+3. Create a feature branch: `git checkout -b feature/your-feature`
+4. Commit your changes: `git commit -m "feat: add your feature"`
+5. Push and open a pull request
+
+---
+
+## 📄 License
+
+> No license has been chosen yet. Add a `LICENSE` file (e.g., MIT or Apache-2.0) before distributing. Until then, do not assume others have permission to reuse this code.
+
+---
+
+## 👨‍💻 Author
+
+**Akash T.**
+Final-year B.Tech, Artificial Intelligence & Data Science
+
+[![GitHub](https://img.shields.io/badge/GitHub-akashtcaa2005-181717?style=for-the-badge&logo=github)](https://github.com/akashtcaa2005)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Akash%20T.-0A66C2?style=for-the-badge&logo=linkedin)](https://linkedin.com/in/akash-t-845439314/)
+
+---
+
+<div align="center">
+
+**🩺 BioSence**
+
+*Better Data → Smarter Insights → Healthier Tomorrow*
+
+⭐ If you find this project interesting, consider giving it a star!
+
+</div>
