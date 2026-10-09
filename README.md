@@ -165,144 +165,206 @@ Better Data  →  Smarter Insights  →  Healthier Tomorrow
 
 ---
 
-# BioSence Architecture
+# 🧬 BioSence Architecture
 
-> **Status:** Intended architecture. Components are marked as implemented, partial, or planned as development progresses.
-> BioSence is a monitoring and decision-support prototype, **not** a diagnostic medical device.
+> **Status:** Intended architecture. Update the status table at the bottom as features are built and tested.
+> ⚠️ BioSence is a monitoring and decision-support prototype, **not** a diagnostic medical device.
 
-## System Architecture
+### 🎨 Legend
+
+| Color | Meaning |
+|---|---|
+| 🟦 Blue | Users and client apps |
+| 🟪 Purple | Security and access control |
+| 🟩 Green | Data storage |
+| 🟧 Orange | AI / ML |
+| 🟥 Red | Alerts, quarantine, audit |
+| 🟨 Yellow | GenAI / RAG |
+
+---
+
+## 1️⃣ Big Picture
+
+```mermaid
+flowchart LR
+    P["👤 PATIENT<br/>Dashboard"]:::user
+    A["🛡️ ADMIN<br/>Panel"]:::user
+    SEC["🔐 AUTH + RBAC + RLS"]:::sec
+    DATA[("🗄️ DATABASE<br/>Supabase PostgreSQL")]:::data
+    ML["🧠 AI / ML<br/>Anomaly + Forecast"]:::ml
+    RAG["💬 GenAI ASSISTANT<br/>RAG + Gemini"]:::rag
+    AL["🚨 ALERTS"]:::alert
+
+    P --> SEC
+    A --> SEC
+    SEC --> DATA
+    DATA --> ML
+    DATA --> RAG
+    ML --> AL
+    AL --> P
+    AL --> A
+    RAG --> P
+
+    classDef user fill:#1d4ed8,stroke:#1e3a8a,color:#ffffff,stroke-width:3px,font-size:18px
+    classDef sec fill:#7e22ce,stroke:#581c87,color:#ffffff,stroke-width:3px,font-size:18px
+    classDef data fill:#15803d,stroke:#14532d,color:#ffffff,stroke-width:3px,font-size:18px
+    classDef ml fill:#ea580c,stroke:#9a3412,color:#ffffff,stroke-width:3px,font-size:18px
+    classDef rag fill:#ca8a04,stroke:#713f12,color:#ffffff,stroke-width:3px,font-size:18px
+    classDef alert fill:#dc2626,stroke:#7f1d1d,color:#ffffff,stroke-width:3px,font-size:18px
+```
+
+---
+
+## 2️⃣ Patient vs Admin Access
 
 ```mermaid
 flowchart TB
-    %% ---------- CLIENT ZONE (untrusted) ----------
-    subgraph CLIENT["Client Zone - untrusted"]
-        direction LR
-        U["Patient / User"] --> UD["Patient Dashboard<br/>profile, readings, trends,<br/>alerts, forecasts, assistant"]
-        A["Authorized Admin"] --> AD["Admin Panel<br/>users, alert queue, ingestion status,<br/>AI health, audit viewer"]
-    end
+    P["👤 PATIENT"]:::user
+    A["🛡️ ADMIN"]:::user
 
-    %% ---------- ACCESS LAYER ----------
-    subgraph ACCESS["Access Layer"]
-        direction TB
-        AUTH["Supabase Auth<br/>sessions + JWT"]
-        GW["API Gateway / FastAPI<br/>validation, rate limiting"]
-        RBAC["Server-side RBAC<br/>role read from DB, never from client"]
-        AUTH --> GW --> RBAC
-    end
+    AUTH["🔑 Supabase Auth<br/>JWT session"]:::sec
+    RBAC["🔐 Server-side RBAC<br/>role read from DB<br/>never from the client"]:::sec
 
-    UD -->|"user JWT"| AUTH
-    AD -->|"admin JWT + MFA"| AUTH
+    UAPI["📱 User API<br/>/api/user/*<br/>OWN records only"]:::user
+    AAPI["🛠️ Admin API<br/>/api/admin/*<br/>role + purpose check + MFA"]:::user
 
-    RBAC -->|"/api/user/*  own records only"| UAPI
-    RBAC -->|"/api/admin/*  role + purpose check"| AAPI
+    RLS["🧱 Row Level Security<br/>auth.uid = owner"]:::sec
+    DB[("🗄️ Database")]:::data
+    AUDIT[("📜 Audit Log<br/>append-only")]:::alert
 
-    %% ---------- APPLICATION SERVICES ----------
-    subgraph APP["Application Services - trusted backend"]
-        direction TB
-        UAPI["User API<br/>profile, readings, alerts,<br/>forecasts, assistant"]
-        AAPI["Admin API<br/>user and role management,<br/>alert triage, ingestion status"]
-    end
+    P --> AUTH
+    A --> AUTH
+    AUTH --> RBAC
+    RBAC --> UAPI
+    RBAC --> AAPI
+    UAPI --> RLS --> DB
+    AAPI -->|"scoped reads"| DB
+    AAPI -->|"every access logged"| AUDIT
+    RBAC -->|"role changes + denials"| AUDIT
 
-    %% ---------- INGESTION ----------
-    subgraph INGEST["Data Ingestion"]
-        direction TB
-        SRC1["Manual entry"]
-        SRC2["Wearable adapter<br/>Fitbit / Health Connect / other"]
-        SRC3["Simulated dataset adapter<br/>LABELLED SYNTHETIC"]
-        VAL["Validation<br/>units, ranges, timestamps to UTC"]
-        DEDUP["Idempotent dedupe<br/>user + device + metric + timestamp"]
-        QUAR["Quarantine<br/>invalid or implausible readings"]
-        SRC1 --> VAL
-        SRC2 --> VAL
-        SRC3 --> VAL
-        VAL -->|valid| DEDUP
-        VAL -->|invalid| QUAR
-    end
-
-    UAPI --> SRC1
-    UAPI --> SRC2
-    SRC3 -.->|"dev / demo only"| VAL
-
-    %% ---------- DATA ZONE ----------
-    subgraph DATA["Data Zone - Supabase PostgreSQL with RLS"]
-        direction TB
-        DB[("health_readings, profiles,<br/>user_roles, devices,<br/>consent_records")]
-        INSIGHT[("personal_baselines,<br/>anomaly_events, forecasts,<br/>model_evaluations")]
-        ALERTDB[("alerts, alert_events")]
-        AUDIT[("audit_logs<br/>append-only")]
-    end
-
-    DEDUP --> DB
-    UAPI -->|"RLS: auth.uid = owner"| DB
-    AAPI -->|"scoped, purpose-limited reads"| DB
-
-    %% ---------- AI / ML ----------
-    subgraph ML["AI / ML Intelligence"]
-        direction TB
-        BASE["Baseline builder<br/>per user, robust statistics"]
-        ANOM["Anomaly detection<br/>Modified Z-Score first, ML if justified"]
-        FORE["Forecasting<br/>vs naive baseline, time-split eval"]
-        EVAL["Evaluation and drift monitor<br/>precision, recall, F1, MAE, RMSE"]
-        BASE --> ANOM
-        BASE --> FORE
-        ANOM --> EVAL
-        FORE --> EVAL
-    end
-
-    DB --> BASE
-    ANOM --> INSIGHT
-    FORE --> INSIGHT
-    EVAL --> INSIGHT
-
-    %% ---------- ALERTS ----------
-    subgraph ALERTS["Alert Lifecycle"]
-        direction LR
-        AL1["Rule engine<br/>configured and tested rules"] --> AL2["Alert created"]
-        AL2 --> AL3["Notify user"]
-        AL2 --> AL4["Admin queue"]
-        AL4 --> AL5["Acknowledged"] --> AL6["Resolved"]
-    end
-
-    ANOM --> AL1
-    AL2 --> ALERTDB
-    AL3 --> UAPI
-    AL4 --> AAPI
-    AL5 --> AUDIT
-    AL6 --> AUDIT
-
-    %% ---------- GENAI / RAG ----------
-    subgraph RAGZ["GenAI / RAG - grounded, citation-checked"]
-        direction TB
-        DOC["Approved health documents"] --> CHUNK["Extract, clean, chunk<br/>with source metadata"]
-        CHUNK --> EMB["Embeddings"] --> VS[("Vector store<br/>FAISS or pgvector")]
-        Q["User question<br/>PII minimised"] --> RET["Retrieve + filter evidence"]
-        VS --> RET
-        RET --> GUARD["Prompt-injection guard<br/>retrieved text = data, not instructions"]
-        GUARD --> LLM["Google Gemini"]
-        LLM --> CITE["Citation validator<br/>every source must be a real retrieved chunk"]
-        CITE -->|"evidence ok"| ANS["Answer + sources"]
-        CITE -->|"insufficient or contradictory"| ABS["Safe abstention"]
-    end
-
-    UAPI --> Q
-    ANS --> UAPI
-    ABS --> UAPI
-    INSIGHT -.->|"consented, minimal context only"| Q
-
-    %% ---------- AUDIT + OPS ----------
-    AAPI -->|"every sensitive access logged"| AUDIT
-    RBAC -->|"role changes and denials"| AUDIT
-
-    subgraph OPS["Operations"]
-        direction LR
-        MON["Health checks, logs<br/>no health data in logs"]
-        CICD["CI/CD, tests, dependency scans"]
-    end
-
-    APP --> MON
-    ML --> MON
-    RAGZ --> MON
+    classDef user fill:#1d4ed8,stroke:#1e3a8a,color:#ffffff,stroke-width:3px,font-size:16px
+    classDef sec fill:#7e22ce,stroke:#581c87,color:#ffffff,stroke-width:3px,font-size:16px
+    classDef data fill:#15803d,stroke:#14532d,color:#ffffff,stroke-width:3px,font-size:16px
+    classDef alert fill:#dc2626,stroke:#7f1d1d,color:#ffffff,stroke-width:3px,font-size:16px
 ```
+
+| | 👤 Patient | 🛡️ Admin |
+|---|---|---|
+| **Sees** | Own data only | Only what the role and purpose allow |
+| **Enforced by** | RLS in the database | RBAC + purpose check + MFA |
+| **Logged** | Normal activity | **Every** sensitive access |
+
+---
+
+## 3️⃣ Data Ingestion
+
+```mermaid
+flowchart LR
+    S1["✍️ Manual entry"]:::user
+    S2["⌚ Wearable adapter<br/>Fitbit / Health Connect"]:::user
+    S3["🧪 Simulated data<br/>LABELLED SYNTHETIC"]:::alert
+
+    VAL{"✅ Validate<br/>units, ranges,<br/>timestamps to UTC"}:::ml
+    DEDUP["🔁 Dedupe<br/>user + device +<br/>metric + timestamp"]:::ml
+    DB[("🗄️ health_readings")]:::data
+    Q[("🚫 Quarantine<br/>invalid readings")]:::alert
+
+    S1 --> VAL
+    S2 --> VAL
+    S3 -.->|"demo only"| VAL
+    VAL -->|valid| DEDUP --> DB
+    VAL -->|invalid| Q
+
+    classDef user fill:#1d4ed8,stroke:#1e3a8a,color:#ffffff,stroke-width:3px,font-size:16px
+    classDef data fill:#15803d,stroke:#14532d,color:#ffffff,stroke-width:3px,font-size:16px
+    classDef ml fill:#ea580c,stroke:#9a3412,color:#ffffff,stroke-width:3px,font-size:16px
+    classDef alert fill:#dc2626,stroke:#7f1d1d,color:#ffffff,stroke-width:3px,font-size:16px
+```
+
+---
+
+## 4️⃣ AI / ML and Alert Lifecycle
+
+```mermaid
+flowchart LR
+    DB[("🗄️ Readings")]:::data
+    BASE["📏 Personal Baseline<br/>per user, robust stats"]:::ml
+    ANOM["🔍 Anomaly Detection<br/>Modified Z-Score first"]:::ml
+    FORE["📈 Forecasting<br/>vs naive baseline"]:::ml
+    EVAL["📊 Evaluation<br/>Precision, Recall, F1,<br/>MAE, RMSE"]:::ml
+
+    RULE["⚙️ Alert Rules<br/>configured + tested"]:::alert
+    ALERT["🚨 Alert Created"]:::alert
+    USER["👤 Notify User"]:::user
+    QUEUE["🛡️ Admin Queue"]:::user
+    ACK["👀 Acknowledged"]:::alert
+    RES["✅ Resolved"]:::alert
+    AUDIT[("📜 Audit Log")]:::alert
+
+    DB --> BASE --> ANOM --> RULE --> ALERT
+    BASE --> FORE
+    ANOM --> EVAL
+    FORE --> EVAL
+    ALERT --> USER
+    ALERT --> QUEUE --> ACK --> RES
+    ACK --> AUDIT
+    RES --> AUDIT
+
+    classDef user fill:#1d4ed8,stroke:#1e3a8a,color:#ffffff,stroke-width:3px,font-size:16px
+    classDef data fill:#15803d,stroke:#14532d,color:#ffffff,stroke-width:3px,font-size:16px
+    classDef ml fill:#ea580c,stroke:#9a3412,color:#ffffff,stroke-width:3px,font-size:16px
+    classDef alert fill:#dc2626,stroke:#7f1d1d,color:#ffffff,stroke-width:3px,font-size:16px
+```
+
+---
+
+## 5️⃣ GenAI Assistant (RAG)
+
+```mermaid
+flowchart TB
+    DOC["📚 Approved<br/>Health Documents"]:::rag
+    CHUNK["✂️ Extract + Chunk<br/>with source metadata"]:::rag
+    VS[("🧮 Vector Store<br/>FAISS / pgvector")]:::data
+
+    Q["❓ User Question<br/>personal data minimised"]:::user
+    RET["🔎 Retrieve Evidence"]:::rag
+    GUARD["🛡️ Prompt-Injection Guard<br/>documents = data, not instructions"]:::sec
+    LLM["🤖 Google Gemini"]:::rag
+    CITE{"📎 Citation Validator<br/>real retrieved sources only"}:::sec
+    ANS["✅ Answer + Sources"]:::data
+    ABS["🙅 Safe Abstention<br/>not enough evidence"]:::alert
+
+    DOC --> CHUNK --> VS
+    Q --> RET
+    VS --> RET --> GUARD --> LLM --> CITE
+    CITE -->|"evidence OK"| ANS
+    CITE -->|"insufficient / contradictory"| ABS
+
+    classDef user fill:#1d4ed8,stroke:#1e3a8a,color:#ffffff,stroke-width:3px,font-size:16px
+    classDef sec fill:#7e22ce,stroke:#581c87,color:#ffffff,stroke-width:3px,font-size:16px
+    classDef data fill:#15803d,stroke:#14532d,color:#ffffff,stroke-width:3px,font-size:16px
+    classDef rag fill:#ca8a04,stroke:#713f12,color:#ffffff,stroke-width:3px,font-size:16px
+    classDef alert fill:#dc2626,stroke:#7f1d1d,color:#ffffff,stroke-width:3px,font-size:16px
+```
+
+> The assistant never diagnoses. It separates measured readings, algorithm flags, and general health information.
+
+---
+
+## ✅ Component Status
+
+| Component | Status |
+|---|---|
+| 👤 Patient dashboard | ⬜ Planned |
+| 🛡️ Admin panel | ⬜ Planned |
+| 🔐 Auth + RLS | ⬜ Planned |
+| 🔁 Ingestion + validation | ⬜ Planned |
+| 🔍 Anomaly detection | ⬜ Planned |
+| 📈 Forecasting | ⬜ Planned |
+| 💬 RAG assistant | ⬜ Planned |
+| ⌚ Wearable integration | ⬜ Planned |
+
+**Status key:** ⬜ Planned · 🟨 Partial · 🟩 Implemented and tested · 🟥 Blocked
 
 ## Design Decisions
 
