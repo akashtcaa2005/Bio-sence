@@ -316,20 +316,6 @@ flowchart TB
 | **Alerts** | Rule → alert → user notification + admin queue → acknowledged → resolved, with each step audited |
 | **Evaluation** | Metrics and drift monitoring stored with model version metadata |
 
-## Component Status
-
-| Component | Status |
-|---|---|
-| Patient dashboard | Planned / to be verified |
-| Admin panel | Planned / to be verified |
-| Auth + RLS | Planned / to be verified |
-| Ingestion + validation | Planned / to be verified |
-| Anomaly detection | Planned / to be verified |
-| Forecasting | Planned / to be verified |
-| RAG assistant | Planned / to be verified |
-| Wearable integration | Planned / to be verified |
-
-*Update the status column as each component is implemented and tested.*
 
 # 🧬 BioSence Explained Architecture
 
@@ -545,18 +531,6 @@ flowchart TB
 | **Alerts** | Rule → alert → user notification + admin queue → acknowledged → resolved, with each step audited |
 | **Evaluation** | Metrics and drift monitoring stored with model version metadata |
 
-## Component Status
-
-| Component | Status |
-|---|---|
-| Patient dashboard | Planned / to be verified |
-| Admin panel | Planned / to be verified |
-| Auth + RLS | Planned / to be verified |
-| Ingestion + validation | Planned / to be verified |
-| Anomaly detection | Planned / to be verified |
-| Forecasting | Planned / to be verified |
-| RAG assistant | Planned / to be verified |
-| Wearable integration | Planned / to be verified |
 
 *Update the status column as each component is implemented and tested.*
 
@@ -832,18 +806,18 @@ Found a vulnerability? Please report it privately through the contact details be
 
 ## 🗺️ Roadmap
 
-- [ ] Wearable data ingestion pipeline
-- [ ] Personalized baseline engine
-- [ ] Modified Z-Score anomaly detection
-- [ ] ML-based anomaly detection extension
-- [ ] Time-series forecasting module
-- [ ] RAG pipeline with approved document corpus and citations
-- [ ] Interactive user dashboard
-- [ ] Admin dashboard with audit logging
-- [ ] RLS policies and access-control test suite
-- [ ] Evaluation report with published metrics
-- [ ] Dockerized deployment
-- [ ] CI/CD pipeline (GitHub Actions) with automated tests
+-  Wearable data ingestion pipeline
+-  Personalized baseline engine
+-  Modified Z-Score anomaly detection
+-  ML-based anomaly detection extension
+-  Time-series forecasting module
+-  RAG pipeline with approved document corpus and citations
+-  Interactive user dashboard
+-  Admin dashboard with audit logging
+-  RLS policies and access-control test suite
+-  Evaluation report with published metrics
+-  Dockerized deployment
+-  CI/CD pipeline (GitHub Actions) with automated tests
 
 ---
 
