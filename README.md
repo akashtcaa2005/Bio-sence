@@ -165,41 +165,172 @@ Better Data  →  Smarter Insights  →  Healthier Tomorrow
 
 ---
 
-## 🏗️ System Architecture
+# BioSence Architecture
+
+> **Status:** Intended architecture. Components are marked as implemented, partial, or planned as development progresses.
+> BioSence is a monitoring and decision-support prototype, **not** a diagnostic medical device.
+
+## System Architecture
 
 ```mermaid
-flowchart TD
-    U[User / Patient] --> UI[Personal Health Dashboard]
-    A[Authorized Admin] --> AP[Admin Panel]
+flowchart TB
+    %% ---------- CLIENT ZONE (untrusted) ----------
+    subgraph CLIENT["Client Zone - untrusted"]
+        direction LR
+        U["Patient / User"] --> UD["Patient Dashboard<br/>profile, readings, trends,<br/>alerts, forecasts, assistant"]
+        A["Authorized Admin"] --> AD["Admin Panel<br/>users, alert queue, ingestion status,<br/>AI health, audit viewer"]
+    end
 
-    UI --> AUTH[Authentication and Authorization]
-    AP --> AUTH
+    %% ---------- ACCESS LAYER ----------
+    subgraph ACCESS["Access Layer"]
+        direction TB
+        AUTH["Supabase Auth<br/>sessions + JWT"]
+        GW["API Gateway / FastAPI<br/>validation, rate limiting"]
+        RBAC["Server-side RBAC<br/>role read from DB, never from client"]
+        AUTH --> GW --> RBAC
+    end
 
-    UI --> ING[Health Data Ingestion]
-    ING --> PRE[Validation and Preprocessing]
-    PRE --> DB[(PostgreSQL / Supabase)]
+    UD -->|"user JWT"| AUTH
+    AD -->|"admin JWT + MFA"| AUTH
 
-    DB --> ML[AI/ML Intelligence]
-    ML --> AN[Personalized Anomaly Detection]
-    ML --> FC[Predictive Analytics]
+    RBAC -->|"/api/user/*  own records only"| UAPI
+    RBAC -->|"/api/admin/*  role + purpose check"| AAPI
 
-    DB --> RAG[Retrieval-Augmented Generation]
-    DOC[Approved Health Documents] --> RAG
-    RAG --> LLM[Google Gemini]
-    LLM --> UI
+    %% ---------- APPLICATION SERVICES ----------
+    subgraph APP["Application Services - trusted backend"]
+        direction TB
+        UAPI["User API<br/>profile, readings, alerts,<br/>forecasts, assistant"]
+        AAPI["Admin API<br/>user and role management,<br/>alert triage, ingestion status"]
+    end
 
-    AN --> ALERT[Monitoring Alerts]
-    FC --> UI
-    ALERT --> UI
-    ALERT --> AP
+    %% ---------- INGESTION ----------
+    subgraph INGEST["Data Ingestion"]
+        direction TB
+        SRC1["Manual entry"]
+        SRC2["Wearable adapter<br/>Fitbit / Health Connect / other"]
+        SRC3["Simulated dataset adapter<br/>LABELLED SYNTHETIC"]
+        VAL["Validation<br/>units, ranges, timestamps to UTC"]
+        DEDUP["Idempotent dedupe<br/>user + device + metric + timestamp"]
+        QUAR["Quarantine<br/>invalid or implausible readings"]
+        SRC1 --> VAL
+        SRC2 --> VAL
+        SRC3 --> VAL
+        VAL -->|valid| DEDUP
+        VAL -->|invalid| QUAR
+    end
 
-    AUTH --> SEC[Role-Based Access and RLS]
-    SEC --> DB
+    UAPI --> SRC1
+    UAPI --> SRC2
+    SRC3 -.->|"dev / demo only"| VAL
+
+    %% ---------- DATA ZONE ----------
+    subgraph DATA["Data Zone - Supabase PostgreSQL with RLS"]
+        direction TB
+        DB[("health_readings, profiles,<br/>user_roles, devices,<br/>consent_records")]
+        INSIGHT[("personal_baselines,<br/>anomaly_events, forecasts,<br/>model_evaluations")]
+        ALERTDB[("alerts, alert_events")]
+        AUDIT[("audit_logs<br/>append-only")]
+    end
+
+    DEDUP --> DB
+    UAPI -->|"RLS: auth.uid = owner"| DB
+    AAPI -->|"scoped, purpose-limited reads"| DB
+
+    %% ---------- AI / ML ----------
+    subgraph ML["AI / ML Intelligence"]
+        direction TB
+        BASE["Baseline builder<br/>per user, robust statistics"]
+        ANOM["Anomaly detection<br/>Modified Z-Score first, ML if justified"]
+        FORE["Forecasting<br/>vs naive baseline, time-split eval"]
+        EVAL["Evaluation and drift monitor<br/>precision, recall, F1, MAE, RMSE"]
+        BASE --> ANOM
+        BASE --> FORE
+        ANOM --> EVAL
+        FORE --> EVAL
+    end
+
+    DB --> BASE
+    ANOM --> INSIGHT
+    FORE --> INSIGHT
+    EVAL --> INSIGHT
+
+    %% ---------- ALERTS ----------
+    subgraph ALERTS["Alert Lifecycle"]
+        direction LR
+        AL1["Rule engine<br/>configured and tested rules"] --> AL2["Alert created"]
+        AL2 --> AL3["Notify user"]
+        AL2 --> AL4["Admin queue"]
+        AL4 --> AL5["Acknowledged"] --> AL6["Resolved"]
+    end
+
+    ANOM --> AL1
+    AL2 --> ALERTDB
+    AL3 --> UAPI
+    AL4 --> AAPI
+    AL5 --> AUDIT
+    AL6 --> AUDIT
+
+    %% ---------- GENAI / RAG ----------
+    subgraph RAGZ["GenAI / RAG - grounded, citation-checked"]
+        direction TB
+        DOC["Approved health documents"] --> CHUNK["Extract, clean, chunk<br/>with source metadata"]
+        CHUNK --> EMB["Embeddings"] --> VS[("Vector store<br/>FAISS or pgvector")]
+        Q["User question<br/>PII minimised"] --> RET["Retrieve + filter evidence"]
+        VS --> RET
+        RET --> GUARD["Prompt-injection guard<br/>retrieved text = data, not instructions"]
+        GUARD --> LLM["Google Gemini"]
+        LLM --> CITE["Citation validator<br/>every source must be a real retrieved chunk"]
+        CITE -->|"evidence ok"| ANS["Answer + sources"]
+        CITE -->|"insufficient or contradictory"| ABS["Safe abstention"]
+    end
+
+    UAPI --> Q
+    ANS --> UAPI
+    ABS --> UAPI
+    INSIGHT -.->|"consented, minimal context only"| Q
+
+    %% ---------- AUDIT + OPS ----------
+    AAPI -->|"every sensitive access logged"| AUDIT
+    RBAC -->|"role changes and denials"| AUDIT
+
+    subgraph OPS["Operations"]
+        direction LR
+        MON["Health checks, logs<br/>no health data in logs"]
+        CICD["CI/CD, tests, dependency scans"]
+    end
+
+    APP --> MON
+    ML --> MON
+    RAGZ --> MON
 ```
 
-> This diagram represents the **intended architecture**. Components and connections are updated as implementation progresses.
+## Design Decisions
 
----
+| Area | Decision |
+|---|---|
+| **User vs admin** | Separate entry points and API namespaces (`/api/user/*`, `/api/admin/*`); one server-side RBAC check that reads the role from the database |
+| **Admin safety** | Scoped, purpose-limited reads; MFA required; every sensitive access written to the append-only audit log |
+| **Patient isolation** | Row Level Security (`auth.uid() = owner`) enforced in the database, so isolation holds even if an API route has a bug |
+| **Ingestion** | Validation, idempotent dedupe key, and quarantine for invalid readings |
+| **Simulated data** | Separate adapter, always labelled synthetic, never presented as live wearable data |
+| **RAG** | Prompt-injection guard, citation validator, and safe abstention when evidence is insufficient |
+| **Alerts** | Rule → alert → user notification + admin queue → acknowledged → resolved, with each step audited |
+| **Evaluation** | Metrics and drift monitoring stored with model version metadata |
+
+## Component Status
+
+| Component | Status |
+|---|---|
+| Patient dashboard | Planned / to be verified |
+| Admin panel | Planned / to be verified |
+| Auth + RLS | Planned / to be verified |
+| Ingestion + validation | Planned / to be verified |
+| Anomaly detection | Planned / to be verified |
+| Forecasting | Planned / to be verified |
+| RAG assistant | Planned / to be verified |
+| Wearable integration | Planned / to be verified |
+
+*Update the status column as each component is implemented and tested.*
 
 ## 🛠️ Technology Stack
 
