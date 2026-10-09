@@ -1,0 +1,118 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 210 40% 98%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 196 100% 47%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 154 89% 45%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 196 100% 47%;
+
+    --radius: 0.75rem;
+
+    --sidebar-background: 210 40% 98%;
+    --sidebar-foreground: 222 47% 11%;
+    --sidebar-primary: 196 100% 47%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 196 73% 96%;
+    --sidebar-accent-foreground: 222 47% 11%;
+    --sidebar-border: 214 32% 91%;
+    --sidebar-ring: 196 100% 47%;
+  }
+
+  .dark {
+    --background: 220 25% 10%;
+    --foreground: 210 30% 95%;
+
+    --card: 220 22% 14%;
+    --card-foreground: 210 30% 95%;
+
+    --popover: 220 22% 14%;
+    --popover-foreground: 210 30% 95%;
+
+    --primary: 196 90% 52%;
+    --primary-foreground: 220 25% 10%;
+
+    --secondary: 154 70% 42%;
+    --secondary-foreground: 210 30% 95%;
+
+    --muted: 220 20% 20%;
+    --muted-foreground: 215 18% 58%;
+
+    --accent: 220 20% 22%;
+    --accent-foreground: 210 30% 95%;
+
+    --destructive: 0 70% 48%;
+    --destructive-foreground: 210 30% 95%;
+
+    --border: 220 18% 22%;
+    --input: 220 18% 22%;
+    --ring: 196 90% 52%;
+
+    --sidebar-background: 220 28% 8%;
+    --sidebar-foreground: 210 30% 92%;
+    --sidebar-primary: 196 90% 52%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 20% 16%;
+    --sidebar-accent-foreground: 210 30% 92%;
+    --sidebar-border: 220 18% 18%;
+    --sidebar-ring: 196 90% 52%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+}
+
+.health-card {
+  @apply bg-card text-card-foreground rounded-xl border border-border p-4 shadow-sm hover:shadow transition-shadow duration-200;
+}
+
+.status-normal {
+  @apply text-health-normal;
+}
+
+.status-caution {
+  @apply text-health-caution;
+}
+
+.status-abnormal {
+  @apply text-health-abnormal;
+}
+
+.chart-container {
+  @apply h-64 w-full;
+}

@@ -1,0 +1,6 @@
+#1️⃣ Emergency Alert
+ If patient data (from Google Fit) shows dangerous values (e.g., high blood pressure), backend (Supabase) sends an alert.
+ Patient must take food/medicine within 10 minutes.
+
+#2️⃣ Drug Dictionary
+ User enters two medicines → system checks if the combination causes side effects or is safe and shows warning.

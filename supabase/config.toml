@@ -1,0 +1,29 @@
+project_id = "ziomyqwvmbndssrdgmhp"
+
+[functions.send-sos-alert]
+verify_jwt = false
+
+[functions.health-assistant]
+verify_jwt = false
+
+[functions.send-health-alert]
+verify_jwt = false
+
+[functions.send-otp]
+verify_jwt = false
+
+[functions.send-phone-otp]
+verify_jwt = false
+
+[functions.verify-otp]
+verify_jwt = false
+
+[functions.verify-phone-otp]
+verify_jwt = false
+
+[functions.call-doctor]
+verify_jwt = false
+
+[functions.generate-diet-image]
+verify_jwt = false
+
