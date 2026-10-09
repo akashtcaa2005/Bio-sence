@@ -32,6 +32,7 @@
 [Architecture](#-system-architecture) •
 [Tech Stack](#-technology-stack) •
 [Getting Started](#-getting-started) •
+[Structure](#-project-structure) •
 [Evaluation](#-model-evaluation) •
 [Security](#-security-and-privacy) •
 [Roadmap](#-roadmap)
@@ -56,6 +57,7 @@
 - [How It Works](#-how-it-works)
 - [Getting Started](#-getting-started)
 - [Project Structure](#-project-structure)
+- [Documentation](#-documentation)
 - [Model Evaluation](#-model-evaluation)
 - [Security and Privacy](#-security-and-privacy)
 - [Roadmap](#-roadmap)
@@ -249,26 +251,29 @@ flowchart LR
 
 ## 🚀 Getting Started
 
-> ⚠️ The commands below are a **template**. Adjust paths, scripts, and variable names to match the actual repository.
-
 ### Prerequisites
 
 - Python **3.11+**
-- Node.js **18+** and npm (or pnpm)
+- Node.js **18+** and npm
 - A [Supabase](https://supabase.com) project
 - A [Google Gemini API key](https://aistudio.google.com/)
-- Docker (optional)
+- Docker and Docker Compose (optional, recommended)
+- `make` (optional, for shortcuts)
 
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/akashtcaa2005/<repo-name>.git
-cd <repo-name>
+git clone https://github.com/akashtcaa2005/Bio-sense.git
+cd Bio-sense
 ```
 
 ### 2. Configure environment variables
 
-Create a `.env` file (never commit it):
+```bash
+cp .env.example .env
+```
+
+Then fill in your values (never commit `.env`):
 
 ```env
 # Supabase
@@ -283,53 +288,141 @@ GEMINI_API_KEY=your_gemini_api_key
 APP_ENV=development
 ```
 
-### 3. Run the backend
+### 3. Quick start with helper scripts
 
 ```bash
-cd backend
+bash scripts/setup.sh        # install backend + frontend dependencies
+bash scripts/migrate.sh      # apply database migrations
+bash scripts/start-dev.sh    # start backend and frontend in dev mode
+```
+
+### 4. Or run each part manually
+
+**Backend**
+
+```bash
+cd app/backend
 python -m venv .venv
-source .venv/bin/activate          # Windows: .venv\Scripts\activate
+source .venv/bin/activate            # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-uvicorn app.main:app --reload
+uvicorn src.main:app --reload        # API on http://localhost:8000
 ```
 
-### 4. Run the frontend
+**Frontend**
 
 ```bash
-cd frontend
+cd app/frontend
 npm install
-npm run dev
+npm run dev                          # App on http://localhost:5173
 ```
 
-### 5. (Optional) Run with Docker
+### 5. Run with Docker
 
 ```bash
 docker compose up --build
+```
+
+### 6. Run the tests
+
+```bash
+# Backend unit + integration tests
+cd app/backend && pytest src/tests
+
+# End-to-end and smoke tests (from the repo root)
+# see tests/e2e and tests/smoke
 ```
 
 ---
 
 ## 🗂️ Project Structure
 
-> Suggested layout. Update to reflect the real repository.
-
 ```text
-biosence/
-├── frontend/              # React + Vite + Tailwind dashboard
-├── backend/               # FastAPI services
-│   ├── app/
-│   │   ├── api/           # Routes
-│   │   ├── ml/            # Baselines, anomaly detection, forecasting
-│   │   ├── rag/           # Ingestion, embeddings, retrieval, generation
-│   │   └── core/          # Config, auth, security
-├── data/                  # Datasets and approved health documents
-├── notebooks/             # Experiments and evaluation
-├── supabase/              # Migrations and RLS policies
-├── docs/                  # Diagrams, screenshots, reports
-├── tests/                 # Unit, integration, access-control tests
+Bio-sense/
+├── README.md
+├── LICENSE
+├── .gitignore
+├── .env.example                 # Template for environment variables
+├── package.json                 # Root JS/TS tooling
+├── pyproject.toml               # Python project configuration
+├── requirements.txt
+├── Dockerfile
 ├── docker-compose.yml
-└── README.md
+├── Makefile                     # Automation shortcuts
+│
+├── app/
+│   ├── backend/
+│   │   ├── requirements.txt
+│   │   └── src/
+│   │       ├── main.py          # Application entry point
+│   │       ├── api/
+│   │       │   ├── routes/      # Endpoint definitions
+│   │       │   ├── middleware/  # Auth, logging, rate limiting
+│   │       │   └── controllers/ # Request handling logic
+│   │       ├── core/
+│   │       │   ├── config/      # Settings and environment loading
+│   │       │   ├── security/    # Auth, RBAC, access checks
+│   │       │   └── utils/
+│   │       ├── models/          # Data models
+│   │       ├── schemas/         # Request/response validation
+│   │       ├── services/        # Business logic: anomaly detection,
+│   │       │                    # forecasting, RAG, alerts
+│   │       ├── db/
+│   │       │   ├── migrations/
+│   │       │   └── seeders/
+│   │       └── tests/
+│   │           ├── unit/
+│   │           └── integration/
+│   │
+│   ├── frontend/
+│   │   ├── package.json
+│   │   ├── vite.config.ts
+│   │   ├── public/
+│   │   └── src/
+│   │       ├── app/             # App shell and routing
+│   │       ├── components/      # Reusable UI components
+│   │       ├── features/        # Dashboard, alerts, assistant, admin
+│   │       ├── hooks/
+│   │       ├── services/        # API clients
+│   │       ├── store/           # State management
+│   │       ├── styles/
+│   │       └── utils/
+│   │
+│   └── shared/
+│       ├── types/               # Shared TypeScript types
+│       ├── constants/
+│       └── helpers/
+│
+├── docs/
+│   ├── architecture.md
+│   ├── api.md
+│   └── deployment.md
+│
+├── scripts/
+│   ├── setup.sh
+│   ├── start-dev.sh
+│   └── migrate.sh
+│
+├── tests/
+│   ├── e2e/                     # End-to-end user flows
+│   ├── smoke/                   # Quick post-deploy checks
+│   └── fixtures/                # Sample data for tests
+│
+└── .github/
+    ├── workflows/
+    │   ├── ci.yml               # Lint + test on every push/PR
+    │   └── deploy.yml           # Deployment pipeline
+    └── ISSUE_TEMPLATE/
 ```
+
+---
+
+## 📚 Documentation
+
+| Document | Description |
+| --- | --- |
+| [Architecture](docs/architecture.md) | System design, data flow, and component responsibilities |
+| [API Reference](docs/api.md) | Endpoints, request/response schemas, and auth |
+| [Deployment](docs/deployment.md) | Docker, environment setup, and hosting guide |
 
 ---
 
@@ -391,6 +484,7 @@ Found a vulnerability? Please report it privately through the contact details be
 - [ ] RLS policies and access-control test suite
 - [ ] Evaluation report with published metrics
 - [ ] Dockerized deployment
+- [ ] CI/CD pipeline (GitHub Actions) with automated tests
 
 ---
 
@@ -402,13 +496,14 @@ Contributions, feedback, and technical suggestions are welcome.
 2. Fork the repository
 3. Create a feature branch: `git checkout -b feature/your-feature`
 4. Commit your changes: `git commit -m "feat: add your feature"`
-5. Push and open a pull request
+5. Make sure tests pass locally; the CI workflow (`.github/workflows/ci.yml`) runs on every pull request
+6. Push and open a pull request
 
 ---
 
 ## 📄 License
 
-> No license has been chosen yet. Add a `LICENSE` file (e.g., MIT or Apache-2.0) before distributing. Until then, do not assume others have permission to reuse this code.
+Distributed under the terms of the [LICENSE](LICENSE) file in this repository.
 
 ---
 
